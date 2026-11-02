@@ -1,23 +1,12 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>RMI Exam 2 Drill</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap">
 <style>
 /* Layout: one narrow working column; a sticky tab bar; the drill card is the only boxed object. */
-:root{
-  --bg:#f3f5f4; --surface:#ffffff; --ink:#15211d; --muted:#5b6b65; --line:#d6dedb;
-  --accent:#0f6b5a; --accent-ink:#ffffff; --accent-soft:#dcefe9;
-  --good:#1d7a3e; --good-soft:#e0f2e6; --bad:#b3261e; --bad-soft:#fbe4e2; --warn:#9a6200; --warn-soft:#fbefd6; --new:#4e5d8c; --new-soft:#e5e8f4;
-  --display:"Archivo","Arial Narrow",system-ui,sans-serif; --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1513; --surface:#17201d; --ink:#e6eeeb; --muted:#93a39d; --line:#2b3733;
-  --accent:#4fc2a6; --accent-ink:#06231c; --accent-soft:#183a32;
-  --good:#6ad08f; --good-soft:#163323; --bad:#ff8a80; --bad-soft:#3d1a18; --warn:#f0b54a; --warn-soft:#3a2c10; --new:#a9b6e8; --new-soft:#232a45; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f1513; --surface:#17201d; --ink:#e6eeeb; --muted:#93a39d; --line:#2b3733;
-  --accent:#4fc2a6; --accent-ink:#06231c; --accent-soft:#183a32;
-  --good:#6ad08f; --good-soft:#163323; --bad:#ff8a80; --bad-soft:#3d1a18; --warn:#f0b54a; --warn-soft:#3a2c10; --new:#a9b6e8; --new-soft:#232a45; color-scheme:dark}
+:root{--bg:#ffffff; --surface:#ffffff; --bg3:#f5f4f2; --ink:#09090b; --muted:#62626a; --line:#e7e5e4;--accent:#0b0b0d; --accent-ink:#ffffff; --accent-soft:#f5f4f2; --accent-text:#c2410c;--good:#15803d; --good-soft:#ecfdf3; --bad:#dc2626; --bad-soft:#fef2f2; --warn:#a16207; --warn-soft:#fefce8; --new:#62626a; --new-soft:#f5f4f2;--shadow:0 1px 2px rgba(0,0,0,.04),0 6px 16px -10px rgba(0,0,0,.12); --glow:rgba(255,92,40,.10);--daybreak:linear-gradient(90deg,#ffb020 0%,#ff5c28 26%,#f2367f 52%,#7c4dff 78%,#3355ff 100%); --dot:linear-gradient(135deg,#ffb020,#ff5c28 55%,#f2367f);--display:Geist,Inter,"Helvetica Neue",Arial,system-ui,sans-serif; --body:var(--display); --mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a0a0a; --surface:#111111; --bg3:#1a1a1a; --ink:#ededed; --muted:#a1a1a1; --line:#242424;--accent:#fafafa; --accent-ink:#0a0a0a; --accent-soft:#1c1c1c; --accent-text:#ff8a3d;--good:#4ade80; --good-soft:#0f2a1a; --bad:#fb7185; --bad-soft:#2a1216; --warn:#fbbf24; --warn-soft:#2a2210; --new:#a1a1a1; --new-soft:#1c1c1c;--shadow:none; --glow:rgba(255,92,40,.14); color-scheme:dark;}}
+:root[data-theme="dark"]{--bg:#0a0a0a; --surface:#111111; --bg3:#1a1a1a; --ink:#ededed; --muted:#a1a1a1; --line:#242424;--accent:#fafafa; --accent-ink:#0a0a0a; --accent-soft:#1c1c1c; --accent-text:#ff8a3d;--good:#4ade80; --good-soft:#0f2a1a; --bad:#fb7185; --bad-soft:#2a1216; --warn:#fbbf24; --warn-soft:#2a2210; --new:#a1a1a1; --new-soft:#1c1c1c;--shadow:none; --glow:rgba(255,92,40,.14); color-scheme:dark;}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);margin:0}
 .wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 64px}
@@ -102,14 +91,82 @@ dialog.nd::backdrop{background:rgba(5,10,8,.7)}
 dialog.nd h2{margin:0 0 6px}
 .nd input{width:100%;font:500 17px var(--body);padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);margin:12px 0 14px}
 .nd input:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+/* ---- Superday Room look ---- */
+body{background:radial-gradient(1100px 420px at 50% -160px,var(--glow),transparent 70%) no-repeat,var(--bg);-webkit-font-smoothing:antialiased}
+.wrap{padding-block:14px 64px}
+.top{display:flex;align-items:center;gap:10px;min-height:58px;padding:8px 10px 8px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:28px;height:28px;flex:none}
+.brand svg rect{fill:var(--ink)} .brand svg path{stroke:var(--bg)}
+.brand b{font:700 16px/1 var(--display);letter-spacing:-.04em;white-space:nowrap}
+.brand b span{font-weight:500;color:var(--muted)}
+.top .sp{flex:1}
+.me{display:flex;align-items:center;gap:6px;margin:0;font-size:13.5px;color:var(--muted);min-width:0}
+.me b{color:var(--ink);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linkbtn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 13px var(--body);border-radius:999px;padding:6px 12px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.linkbtn:hover{background:var(--bg3)}
+.hero{padding:34px 2px 4px}
+.hero .eyebrow{color:var(--accent-text)}
+.hero h1{font:700 clamp(36px,7vw,54px)/1.02 var(--display);letter-spacing:-.05em;margin:10px 0 0;text-wrap:balance}
+.hero h1 i{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:var(--dot);margin-left:.04em;vertical-align:baseline}
+.hero p{margin:12px 0 0;color:var(--muted);font-size:16px;max-width:52ch}
+.sync{font:500 12px var(--mono);color:var(--muted);display:block;margin-top:6px}
+.tabs{display:inline-flex;width:max-content;max-width:100%;gap:2px;margin:22px 0 22px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.04);top:calc(env(safe-area-inset-top,0px) + 8px)}
+.tab{border:0;margin:0;border-radius:999px;padding:8px 16px;font:600 14px var(--body);color:var(--muted);white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.eyebrow{font:600 11.5px var(--mono);letter-spacing:.1em;color:var(--accent-text)}
+.card{position:relative;overflow:hidden;border-radius:16px;padding:30px clamp(18px,4vw,32px) 26px;box-shadow:var(--shadow)}
+.card::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--daybreak);opacity:.85}
+.card h2{font:700 26px/1.15 var(--display);letter-spacing:-.035em}
+h2{font:700 24px/1.2 var(--display);letter-spacing:-.035em}
+h3.mod{font:700 18px var(--display);letter-spacing:-.025em}
+.qtext{font:600 22px/1.4 var(--display);letter-spacing:-.025em;margin:2px 0 20px}
+.chip{font:600 12px var(--body);padding:3px 10px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.chip.weak{border-color:color-mix(in srgb,var(--bad) 35%,transparent)} .chip.shaky{border-color:color-mix(in srgb,var(--warn) 35%,transparent)} .chip.solid{border-color:color-mix(in srgb,var(--good) 35%,transparent)}
+.opts{gap:10px}
+.opt{align-items:center;gap:14px;background:var(--surface);border-radius:12px;padding:13px 16px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:border-color .15s,background .15s}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .L{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--bg3);border:1px solid var(--line);font:600 12px var(--mono);color:var(--muted)}
+.opt.sel{background:var(--bg3);border-color:var(--ink)} .opt.sel .L{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.opt.right .L{background:var(--good);color:#fff;border-color:var(--good)} .opt.wrong .L{background:var(--bad);color:#fff;border-color:var(--bad)}
+.fb{border-left:0;padding:16px 18px;border-radius:12px;background:var(--good-soft);margin-top:18px}
+.fb.no{background:var(--bad-soft)}
+.fb h3{font:700 17px var(--display);letter-spacing:-.02em;color:var(--good)} .fb.no h3{color:var(--bad)}
+.btn{border-radius:999px;padding:11px 20px;font:600 15px var(--body);display:inline-flex;align-items:center;gap:10px;transition:background .15s,box-shadow .15s}
+.btn:not(.ghost):not(.danger){background:#0b0b0d;border-color:#0b0b0d;color:#fff}
+.btn:not(.ghost):not(.danger):hover{background:#26262b;box-shadow:0 10px 24px -12px rgba(255,92,40,.7)}
+.btn:not(.ghost):not(.danger)::after{content:"→";display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--dot);color:#fff;font-size:13px;line-height:1}
+:root[data-theme="dark"] .btn:not(.ghost):not(.danger){background:#fafafa;border-color:#fafafa;color:#0a0a0a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn:not(.ghost):not(.danger){background:#fafafa;border-color:#fafafa;color:#0a0a0a}}
+.btn.ghost{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.btn.ghost:hover{background:var(--bg3)}
+.btn:disabled{opacity:.45;cursor:default}
+.pip{height:4px;border-radius:2px}
+.pip.cur{background:var(--daybreak)}
+.bar{height:6px;border-radius:3px}
+.qgrid button{border-radius:8px;width:32px;height:30px}
+.qgrid button.done{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.callout{background:var(--bg3);border:1px solid var(--line);border-radius:12px}
+.slidebtn{background:var(--surface);border:1px solid var(--line);color:var(--ink);font:600 12.5px var(--mono);padding:7px 13px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.slidebtn:hover{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+dialog.sv,dialog.nd{border-radius:18px;box-shadow:0 30px 60px -12px rgba(0,0,0,.25),0 18px 36px -18px rgba(0,0,0,.3)}
+dialog.sv::backdrop,dialog.nd::backdrop{background:rgba(10,10,10,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+dialog.nd{padding:30px 26px 24px;text-align:center;overflow:hidden}
+dialog.nd::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:var(--daybreak)}
+dialog.nd .mark{width:44px;height:44px;margin:0 auto 14px;display:block}
+dialog.nd .mark rect{fill:var(--ink)} dialog.nd .mark path{stroke:var(--bg)}
+dialog.nd h2{font:700 24px/1.15 var(--display);letter-spacing:-.035em}
+.nd input{border-radius:12px;text-align:center;background:var(--surface);padding:13px 14px}
+.nd .btn{justify-content:center}
+footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+@media (max-width:520px){.me>span{display:none}.brand b span{display:none}.hero{padding-top:26px}.qtext{font-size:19px}.tab{padding:7px 10px;font-size:13px}.tabs{scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}}
 </style></head><body>
 
 <div class="wrap">
-<header>
-  <h1>RMI Exam 2 Drill</h1>
-  <p>Modules 5 to 9. Batches of 10 that lean harder on whatever you miss. <span class="sync" id="sync"></span></p>
-  <p class="me">Studying as <b id="who"></b> <button class="linkbtn" id="switch">Switch name</button></p>
-</header>
+<header class="top"><div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7.5"/><path d="M12 23.5V9.5h5.6a4 4 0 0 1 0 8H12M17.4 17.5l4.2 6" fill="none" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="dga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb020"/><stop offset=".55" stop-color="#ff5c28"/><stop offset="1" stop-color="#f2367f"/></linearGradient></defs><circle cx="24.6" cy="9.2" r="1.85" fill="url(#dga)"/></svg><b>RMI <span>Exam 2 Room</span></b></div><div class="sp"></div><p class="me"><span>Studying as</span> <b id="who"></b> <button class="linkbtn" id="switch">Switch</button></p></header>
+<div class="hero"><span class="eyebrow">RMI 2302 · Modules 5 to 9</span><h1>Study for Exam 2<i aria-hidden="true"></i></h1><p>Batches of 10 that lean harder on whatever you miss. <span class="sync" id="sync"></span></p></div>
 <nav class="tabs" role="tablist">
   <button class="tab" role="tab" id="tab-drill" aria-selected="true" data-v="drill">Drill</button>
   <button class="tab" role="tab" id="tab-exam" aria-selected="false" data-v="exam">Practice exam</button>
@@ -117,9 +174,10 @@ dialog.nd h2{margin:0 0 6px}
   <button class="tab" role="tab" id="tab-guide" aria-selected="false" data-v="guide">Study guide</button>
 </nav>
 <main id="view"></main>
+<footer class="foot"><span>RMI 2302 Exam 2 study drill</span><span>Not an official course site</span></footer>
 </div>
 <dialog class="nd" id="nd" aria-labelledby="nd-t">
-  <form id="nd-form"><h2 id="nd-t">What's your name?</h2>
+  <form id="nd-form"><svg viewBox="0 0 32 32" aria-hidden="true" class="mark"><rect width="32" height="32" rx="7.5"/><path d="M12 23.5V9.5h5.6a4 4 0 0 1 0 8H12M17.4 17.5l4.2 6" fill="none" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="dgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb020"/><stop offset=".55" stop-color="#ff5c28"/><stop offset="1" stop-color="#f2367f"/></linearGradient></defs><circle cx="24.6" cy="9.2" r="1.85" fill="url(#dgb)"/></svg><h2 id="nd-t">What's your name?</h2>
   <p class="hint">Type the same name every time you come back and your progress picks up where you left off, on any device.</p>
   <input id="nd-in" autocomplete="nickname" maxlength="40" placeholder="Your name" aria-label="Your name">
   <button class="btn" type="submit" style="width:100%">Start studying</button></form>
