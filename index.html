@@ -537,7 +537,7 @@ async function loadUser(name){
   S=fresh(); try{const s=JSON.parse(localStorage.getItem(userKey())||"null"); if(s&&s.recs) S=Object.assign(fresh(),s)}catch(e){}
   document.getElementById("who").textContent=USER; render(); setSync("· loading…");
   try{ const remote=await rpc("rmi_load",{p_name:USER});
-    if(remote&&remote.recs&&(remote.updated|0)>(S.updated|0)){S=Object.assign(fresh(),remote); try{localStorage.setItem(userKey(),JSON.stringify(S))}catch(e){} render()}
+    if(remote&&remote.recs&&(+remote.updated||0)>(+S.updated||0)){S=Object.assign(fresh(),remote); try{localStorage.setItem(userKey(),JSON.stringify(S))}catch(e){} render()}
     else if(Object.keys(S.recs).length) flush();
     setSync(remote?"· welcome back, progress loaded":"· new name, progress will save as you go");
   }catch(e){ setSync("· saved on this device only") }
