@@ -93,6 +93,16 @@ dialog.sv::backdrop{background:rgba(5,10,8,.7)}
 .lorev .obj{margin:0 0 8px}
 .lorev .ans{margin-top:10px}
 .lorev .ans p{margin:0 0 6px}
+.pred .predtop{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;margin:6px 0 10px}
+.pred .predside{max-width:320px}
+.up{color:var(--good)} .down{color:var(--bad)}
+.predsvg{display:block;width:100%;height:auto;margin:6px 0 10px}
+.predsvg .pg{stroke:var(--line);stroke-width:1}
+.predsvg .pt{fill:var(--muted);font:12px var(--body)}
+.predsvg .pb{fill:var(--accent);opacity:.14}
+.predsvg .pl{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.predsvg .pd{fill:var(--accent)}
+.predline{margin:6px 0 0;font-size:15px}
 .lotag{margin:0 0 6px;font-size:13px;line-height:1.4;color:var(--muted)}
 .me{margin:8px 0 0;font-size:14px;color:var(--muted)} .me b{color:var(--ink)}
 .linkbtn{appearance:none;border:0;background:none;color:var(--accent);font:600 14px var(--body);text-decoration:underline;cursor:pointer;padding:2px 4px}
@@ -614,7 +624,7 @@ const BATCH=10, KEY="rmi-exam2-drill-v1";
 const fresh=()=>({recs:{},batch:0,lastBatch:[],cur:null,updated:0});
 let S=fresh(), USER="";
 const userKey=()=>KEY+":"+USER.toLowerCase();
-function saveLocal(){S.updated=Date.now();try{localStorage.setItem(userKey(),JSON.stringify(S))}catch(e){} cloudSave()}
+function saveLocal(){snapPred();S.updated=Date.now();try{localStorage.setItem(userKey(),JSON.stringify(S))}catch(e){} cloudSave()}
 
 // ---------- adaptive model ----------
 function recOf(id){return S.recs[id]}
@@ -682,6 +692,66 @@ function buildBatch(){
   S.batch+=1;
   S.cur={n:S.batch,ids:chosen,idx:0,ans:{},before:Object.fromEntries(Object.keys(TOPICS).map(t=>[t,ts[t].m]))};
   saveLocal(); pushMeta();
+}
+
+
+// ---------- exam score predictor ----------
+// Each topic's chance of a right answer blends your recent tries (weighted most), all your past tries
+// on that topic, and your overall accuracy (for topics you have not seen much). Modules count equally,
+// like the practice exam; inside a module, topics with more official review questions count more.
+const TW=(()=>{const w={};for(const t in TOPICS)w[t]=1;for(const q of Q)if(q.src.startsWith("Review"))w[q.t]++;
+  for(const m of [5,6,7,8,9]){const ts=Object.keys(TOPICS).filter(t=>TOPICS[t].m===m);const s=ts.reduce((a,t)=>a+w[t],0);ts.forEach(t=>w[t]=w[t]/s/5)}return w})();
+function answerCount(){let n=0;for(const k in S.recs){const r=S.recs[k];n+=r.r+r.w}return n}
+function predict(){
+  let R=0,N=0; for(const k in S.recs){const r=S.recs[k];R+=r.r;N+=r.r+r.w}
+  const base=(R+.65*6)/(N+6), K=2.5; let score=0,vr=0,cov=0; const topics={};
+  for(const t in TOPICS){const st=topicStats(t); const num=st.m*(st.den+2)-1;
+    const n=st.den+.3*st.att+K, p=(num+.3*st.right+base*K)/n;
+    topics[t]=p; score+=TW[t]*p; vr+=TW[t]*TW[t]*p*(1-p)/n; if(st.den>0) cov+=TW[t]}
+  vr+=score*(1-score)/50; const sd=Math.sqrt(vr);
+  return {score,lo:Math.max(0,score-1.28*sd),hi:Math.min(1,score+1.28*sd),cov,n:N,topics}
+}
+function snapPred(){
+  const n=answerCount(); if(!n) return; const ph=S.ph||(S.ph=[]); const last=ph[ph.length-1];
+  if(last&&last.n===n) return; const p=predict(); const r=x=>Math.round(x*1000)/10;
+  ph.push({n,p:r(p.score),lo:r(p.lo),hi:r(p.hi),t:Date.now()});
+  if(ph.length>300) S.ph=ph.filter((x,i)=>i===0||i===ph.length-1||i%2===0);
+  try{pushMeta()}catch(e){}
+}
+const grade=s=>s>=90?"A":s>=80?"B":s>=70?"C":s>=60?"D":"F";
+function predLine(){
+  const n=answerCount(); if(!n) return "";
+  snapPred(); const ph=S.ph, cur=ph[ph.length-1]; const prev=ph.length>1?ph[Math.max(0,ph.length-11)]:null;
+  const d=prev?Math.round((cur.p-prev.p)*10)/10:0;
+  return `<p class="predline">Predicted exam score: <b>${Math.round(cur.p)}%</b> ${prev&&d?`<span class="${d>0?"up":"down"}">${d>0?"▲ +":"▼ −"}${Math.abs(d)} pts</span>`:""} <span class="hint">· see Progress for the trend</span></p>`;
+}
+function predChart(ph){
+  if(ph.length<2) return `<p class="hint">The graph fills in as you answer. Every answer adds a point.</p>`;
+  const W=640,H=200,pl=34,pr=10,pt=10,pb=26; const x0=ph[0].n,x1=ph[ph.length-1].n||1;
+  const lo=Math.max(0,Math.floor(Math.min(...ph.map(p=>p.lo))/10)*10-10), hi=Math.min(100,Math.ceil(Math.max(...ph.map(p=>p.hi))/10)*10);
+  const X=n=>pl+(W-pl-pr)*(x1===x0?1:(n-x0)/(x1-x0)), Y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo||1));
+  const line=ph.map((p,i)=>(i?"L":"M")+X(p.n).toFixed(1)+" "+Y(p.p).toFixed(1)).join("");
+  const band=ph.map((p,i)=>(i?"L":"M")+X(p.n).toFixed(1)+" "+Y(p.hi).toFixed(1)).join("")+[...ph].reverse().map(p=>"L"+X(p.n).toFixed(1)+" "+Y(p.lo).toFixed(1)).join("")+"Z";
+  let grid=""; for(let v=lo;v<=hi;v+=10) grid+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" class="pg"/><text x="${pl-6}" y="${Y(v)+4}" class="pt" text-anchor="end">${v}</text>`;
+  const c=ph[ph.length-1];
+  return `<svg class="predsvg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Predicted score went from ${ph[0].p}% to ${c.p}% over ${c.n-x0} answers">${grid}
+  <path d="${band}" class="pb"/><path d="${line}" class="pl"/><circle cx="${X(c.n)}" cy="${Y(c.p)}" r="4.5" class="pd"/>
+  <text x="${pl}" y="${H-6}" class="pt">${x0} answers</text><text x="${W-pr}" y="${H-6}" class="pt" text-anchor="end">${c.n} answers</text></svg>`;
+}
+function predCard(){
+  const n=answerCount();
+  if(!n) return `<div class="card pred"><span class="eyebrow">Predicted exam score</span><p>Answer a batch and this will predict your Exam 2 score, then track it as you study.</p></div>`;
+  snapPred(); const p=predict(), ph=S.ph, c=ph[ph.length-1];
+  const prev=ph.length>1?ph[Math.max(0,ph.length-11)]:null, d=prev?Math.round((c.p-prev.p)*10)/10:0, since=prev?c.n-prev.n:0;
+  const sure=p.cov<.6||n<60?"Rough guess so far":p.cov<.9||n<150?"Getting more reliable":"Fairly reliable";
+  const gains=Object.keys(TOPICS).map(t=>({t,g:TW[t]*(1-p.topics[t])})).sort((a,b)=>b.g-a.g).slice(0,3);
+  return `<div class="card pred"><span class="eyebrow">Predicted exam score</span>
+  <div class="predtop"><div><div class="big">${Math.round(c.p)}%</div><div class="hint">about a ${grade(c.p)} · likely between ${Math.round(c.lo)}% and ${Math.round(c.hi)}%</div></div>
+  <div class="predside">${prev?`<div class="${d>0?"up":d<0?"down":""}"><b>${d>0?"▲ +":d<0?"▼ −":""}${Math.abs(d)} pts</b> over your last ${since} answers</div>`:""}
+  <div class="hint">${sure}: based on ${n} answers, ${Math.round(p.cov*100)}% of exam topics tried.</div></div></div>
+  ${predChart(ph)}
+  <p class="hint">How it works: it estimates your chance of getting each topic right from all your answers so far, counting recent ones most, then weights topics like the exam (each module equal, topics with more review questions count more). Topics you haven't tried are guessed from your overall accuracy, so the range narrows as you cover more.</p>
+  <b>Biggest points to gain</b><ul class="plain">${gains.map(x=>`<li>${esc(TOPICS[x.t].n)} <span class="hint">· now ${Math.round(p.topics[x.t]*100)}% · worth up to ${Math.round(x.g*1000)/10} pts</span></li>`).join("")}</ul></div>`;
 }
 
 // ---------- name-based saving ----------
@@ -763,7 +833,7 @@ function finishExam(){
 }
 function renderExamResults(){
   const E=S.exam; const right=E.ids.filter(id=>E.ans[id]===QBY[id].a).length;
-  let h=`<div class="card"><span class="eyebrow">Practice exam ${E.n} finished</span><div class="sumgrid"><div><div class="big">${Math.round(right/E.ids.length*100)}%</div><div class="hint">${right} of ${E.ids.length} correct</div></div><div><b>By module</b><ul class="plain">`;
+  let h=`<div class="card"><span class="eyebrow">Practice exam ${E.n} finished</span>${predLine()}<div class="sumgrid"><div><div class="big">${Math.round(right/E.ids.length*100)}%</div><div class="hint">${right} of ${E.ids.length} correct</div></div><div><b>By module</b><ul class="plain">`;
   for(const m of [5,6,7,8,9]){const ids=E.ids.filter(id=>TOPICS[QBY[id].t].m===m);const r=ids.filter(id=>E.ans[id]===QBY[id].a).length;
     h+=`<li>Module ${m}: ${r}/${ids.length} ${chip(r/ids.length>=.8?"solid":r/ids.length>=.6?"shaky":"weak",r/ids.length>=.8?"Solid":r/ids.length>=.6?"Shaky":"Weak")}</li>`}
   h+=`</ul></div></div><div class="qgrid">${E.ids.map((id,i)=>`<button class="${E.ans[id]===QBY[id].a?"ok":"no"}" data-j="${i}" aria-label="Question ${i+1}">${i+1}</button>`).join("")}</div>`;
@@ -858,7 +928,7 @@ function renderSummary(){
   const weakest=Object.keys(TOPICS).filter(t=>ts[t].status!=="new").sort((a,b)=>ts[a].m-ts[b].m).slice(0,4).filter(t=>ts[t].status!=="solid");
   const unseen=Object.keys(TOPICS).filter(t=>ts[t].status==="new").length;
   const touched=[...new Set(ids.map(id=>QBY[id].t))];
-  let h=`<div class="card"><span class="eyebrow">Batch ${c.n} done</span>
+  let h=`<div class="card"><span class="eyebrow">Batch ${c.n} done</span>${predLine()}
   <div class="sumgrid"><div><div class="big">${right}/${ids.length}</div><div class="hint">correct this batch</div></div>
   <div><b>Next batch will focus on</b><ul class="plain">${weakest.length?weakest.map(t=>`<li>${esc(TOPICS[t].n)} ${chip(ts[t].status)}</li>`).join(""):"<li>Nothing weak right now. It will mix in topics you have not seen.</li>"}${unseen?`<li class="hint">${unseen} topics not tried yet</li>`:""}</ul></div></div>`;
   h+=`<h2>Topics in this batch</h2>`+touched.map(t=>{const b=c.before[t],a=ts[t].m;const d=Math.round((a-b)*100);return `<div class="trow"><div class="nm">${esc(TOPICS[t].n)} ${chip(ts[t].status)}</div><div class="bar"><i class="${ts[t].status}" style="width:${Math.round(a*100)}%"></i></div><div class="tnum">${d>0?"+":""}${d}</div></div>`}).join("");
@@ -872,7 +942,7 @@ function renderProgress(){
   const ts=Object.fromEntries(Object.keys(TOPICS).map(t=>[t,topicStats(t)]));
   const tot=Object.values(S.recs).reduce((a,r)=>a+r.r+r.w,0), rt=Object.values(S.recs).reduce((a,r)=>a+r.r,0);
   const counts={weak:0,shaky:0,solid:0,new:0}; Object.values(ts).forEach(s=>counts[s.status]++);
-  let h=`<div class="sumgrid"><div><div class="big">${tot?Math.round(rt/tot*100):0}%</div><div class="hint">${rt} of ${tot} answers correct · ${S.batch} batches</div></div>
+  let h=predCard()+`<div class="sumgrid"><div><div class="big">${tot?Math.round(rt/tot*100):0}%</div><div class="hint">${rt} of ${tot} answers correct · ${S.batch} batches</div></div>
   <div>${chip("weak")} ${counts.weak} &nbsp;${chip("shaky")} ${counts.shaky} &nbsp;${chip("solid")} ${counts.solid} &nbsp;${chip("new")} ${counts.new}<p class="hint">Mastery weighs your last few tries on each question most, so old mistakes fade once you fix them.</p></div></div>`;
   for(const m of [5,6,7,8,9]){
     h+=`<h3 class="mod">${MODS[m]}</h3>`;
