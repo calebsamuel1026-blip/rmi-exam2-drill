@@ -640,6 +640,9 @@ function topicStats(t){
   return {m,den,att,right,status};
 }
 function streak(r){let s=0;for(let i=r.h.length-1;i>=0&&r.h[i]===1;i--)s++;return s}
+// right this many times in a row: the question leaves the drills (still counts for mastery and the practice exam)
+const RETIRE=3;
+function retired(id){const r=recOf(id);return !!r&&streak(r)>=RETIRE}
 // topic first: weak topics dominate, untried topics get a fair share, solid ones rarely appear
 function tWeight(st){ if(st.status==="new") return 5; const weak=1-st.m; return .2+10*weak*weak }
 function qWeight(q){
@@ -667,10 +670,13 @@ function buildBatch(){
       for(const t of ts2){const c=Q.filter(q=>q.t===t);const rv=c.filter(q=>q.src.startsWith("Review"));const p=(rv.length?rv:c);chosen.push(p[Math.floor(Math.random()*p.length)].id)}
     }
   }else{
-    const perTopic={}; let pool=Q.slice();
+    const perTopic={}; let pool=Q.filter(q=>!retired(q.id));
+    // nearly everything retired: bring back the ones seen longest ago
+    if(pool.length<BATCH) pool=pool.concat(Q.filter(q=>retired(q.id)).sort((a,b)=>(recOf(a.id).lb||0)-(recOf(b.id).lb||0)).slice(0,BATCH-pool.length));
     const solids=Object.keys(ts).filter(t=>ts[t].status==="solid");
-    if(solids.length){ // one spaced-review question from a topic you already know
-      const c=Q.filter(q=>solids.includes(q.t)); const ws=c.map(q=>{const r=recOf(q.id);return r?1+(S.batch-(r.lb||0)):2});
+    const c=pool.filter(q=>solids.includes(q.t));
+    if(c.length){ // one spaced-review question from a topic you already know
+      const ws=c.map(q=>{const r=recOf(q.id);return r?1+(S.batch-(r.lb||0)):2});
       const q=c[pick(c,ws)]; chosen.push(q.id); perTopic[q.t]=1; pool=pool.filter(p=>p.id!==q.id);
     }
     while(chosen.length<BATCH&&pool.length){
@@ -943,7 +949,7 @@ function renderProgress(){
   const tot=Object.values(S.recs).reduce((a,r)=>a+r.r+r.w,0), rt=Object.values(S.recs).reduce((a,r)=>a+r.r,0);
   const counts={weak:0,shaky:0,solid:0,new:0}; Object.values(ts).forEach(s=>counts[s.status]++);
   let h=predCard()+`<div class="sumgrid"><div><div class="big">${tot?Math.round(rt/tot*100):0}%</div><div class="hint">${rt} of ${tot} answers correct · ${S.batch} batches</div></div>
-  <div>${chip("weak")} ${counts.weak} &nbsp;${chip("shaky")} ${counts.shaky} &nbsp;${chip("solid")} ${counts.solid} &nbsp;${chip("new")} ${counts.new}<p class="hint">Mastery weighs your last few tries on each question most, so old mistakes fade once you fix them.</p></div></div>`;
+  <div>${chip("weak")} ${counts.weak} &nbsp;${chip("shaky")} ${counts.shaky} &nbsp;${chip("solid")} ${counts.solid} &nbsp;${chip("new")} ${counts.new}<p class="hint">Mastery weighs your last few tries on each question most, so old mistakes fade once you fix them.</p><p class="hint">${Q.filter(q=>retired(q.id)).length} of ${Q.length} questions retired (right ${RETIRE} times in a row), so drills skip them. Miss one in a practice exam and it comes back.</p></div></div>`;
   for(const m of [5,6,7,8,9]){
     h+=`<h3 class="mod">${MODS[m]}</h3>`;
     Object.keys(TOPICS).filter(t=>TOPICS[t].m===m).forEach(t=>{const s=ts[t];
