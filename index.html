@@ -922,7 +922,7 @@ function renderStart(){
   const seen=Object.keys(S.recs).length;
   V.innerHTML=`<div class="card"><span class="eyebrow">${seen?"Ready for batch "+(S.batch+1):"Start here"}</span>
   <h2 style="margin-top:6px">${seen?"Next batch, weighted to your weak spots":"First batch: a quick diagnostic"}</h2>
-  <p>${seen?"The next 10 questions are picked mostly from the topics you are missing, plus questions you got wrong that come back until you get them right twice. One question checks a topic you already know so it stays fresh.":"10 questions, 2 from each module, so the drill can see where you stand. After that, every batch is weighted toward what you miss."}</p>
+  <p>${seen?"The next 10 questions are picked mostly from the topics you are missing, plus questions you got wrong that come back until you get them right three times in a row. One question checks a topic you already know so it stays fresh.":"10 questions, 2 from each module, so the drill can see where you stand. After that, every batch is weighted toward what you miss."}</p>
   <p class="hint">${Q.length} questions: the 48 official review questions with the professor’s key, all five of your Canvas module quizzes with Canvas’s answers, new questions built from the Module 5 to 9 slides, and 2 questions for every learning objective.</p>
   <div class="actions"><button class="btn" id="go">Start batch ${S.batch+1}</button></div></div>`;
   document.getElementById("go").onclick=()=>{buildBatch();renderDrill()};
@@ -938,7 +938,7 @@ function renderSummary(){
   <div class="sumgrid"><div><div class="big">${right}/${ids.length}</div><div class="hint">correct this batch</div></div>
   <div><b>Next batch will focus on</b><ul class="plain">${weakest.length?weakest.map(t=>`<li>${esc(TOPICS[t].n)} ${chip(ts[t].status)}</li>`).join(""):"<li>Nothing weak right now. It will mix in topics you have not seen.</li>"}${unseen?`<li class="hint">${unseen} topics not tried yet</li>`:""}</ul></div></div>`;
   h+=`<h2>Topics in this batch</h2>`+touched.map(t=>{const b=c.before[t],a=ts[t].m;const d=Math.round((a-b)*100);return `<div class="trow"><div class="nm">${esc(TOPICS[t].n)} ${chip(ts[t].status)}</div><div class="bar"><i class="${ts[t].status}" style="width:${Math.round(a*100)}%"></i></div><div class="tnum">${d>0?"+":""}${d}</div></div>`}).join("");
-  if(missed.length) h+=`<h2>What you missed</h2><div class="missed">${missed.map(id=>{const q=QBY[id];return `<div><b>${esc(q.q.split("\n")[0])}</b><span class="hint">Answer: ${L[q.a]}. ${esc(q.o[q.a])} · ${esc(q.ref)}</span>${slideBtns(q)}</div>`}).join("")}</div><p class="hint">These come back in later batches until you get each one right twice in a row.</p>`;
+  if(missed.length) h+=`<h2>What you missed</h2><div class="missed">${missed.map(id=>{const q=QBY[id];return `<div><b>${esc(q.q.split("\n")[0])}</b><span class="hint">Answer: ${L[q.a]}. ${esc(q.o[q.a])} · ${esc(q.ref)}</span>${slideBtns(q)}</div>`}).join("")}</div><p class="hint">These come back in later batches until you get each one right three times in a row.</p>`;
   h+=`<div class="actions"><button class="btn" id="go">Start batch ${S.batch+1}</button><button class="btn ghost" id="pg">See all progress</button></div></div>`;
   V.innerHTML=h;
   document.getElementById("go").onclick=()=>{S.lastBatch=c.ids.slice();buildBatch();renderDrill();window.scrollTo({top:0})};
